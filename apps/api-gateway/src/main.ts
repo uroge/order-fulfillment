@@ -3,10 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from '@order-fulfillment/shared';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
+
   app.setGlobalPrefix(globalPrefix);
 
   app.useGlobalPipes(
@@ -18,6 +20,16 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  const documentBuilder = new DocumentBuilder()
+    .setTitle('Order Fulfillment API Gateway')
+    .setDescription('API Gateway for microservices')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, documentBuilder);
+  SwaggerModule.setup('api/docs', app, document);
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') || 3000;
