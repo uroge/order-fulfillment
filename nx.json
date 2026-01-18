@@ -37,7 +37,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/order-fulfillment-e2e/**/*"]
+      "exclude": ["apps/api-gateway-e2e/**/*"]
     }
   ]
 }
