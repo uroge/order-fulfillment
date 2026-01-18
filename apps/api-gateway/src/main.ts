@@ -1,12 +1,8 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
+import { HttpExceptionFilter } from '@order-fulfillment/shared';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +16,8 @@ async function bootstrap() {
       transform: true,
     })
   );
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') || 3000;
