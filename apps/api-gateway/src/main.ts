@@ -2,11 +2,13 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
-import { HttpExceptionFilter } from '@order-fulfillment/shared';
+import { HttpExceptionFilter, JsonLoggerService } from '@order-fulfillment/shared';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = app.get(JsonLoggerService);
+  app.useLogger(logger);
   const globalPrefix = 'api';
 
   app.setGlobalPrefix(globalPrefix);
