@@ -7,6 +7,8 @@ import { TestController } from '../test/test.controller';
 import {
   CorrelationIdMiddleware,
   CorrelationIdService,
+  JsonLoggerService,
+  RequestLoggingMiddleware,
 } from '@order-fulfillment/shared';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -31,6 +33,8 @@ import { APP_GUARD } from '@nestjs/core';
   providers: [
     AppService,
     CorrelationIdService,
+    JsonLoggerService,
+    RequestLoggingMiddleware,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
@@ -39,6 +43,8 @@ import { APP_GUARD } from '@nestjs/core';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer
+      .apply(CorrelationIdMiddleware, RequestLoggingMiddleware)
+      .forRoutes('*');
   }
 }
