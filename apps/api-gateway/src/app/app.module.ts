@@ -8,13 +8,8 @@ import {
   CorrelationIdMiddleware,
   CorrelationIdService,
 } from '@order-fulfillment/shared';
-
-// TODO:
-// [] Corellation ids implementation
-// [] Rate limiting
-// [] Docker
-// [] Logging
-// [] Monitoring
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -22,10 +17,25 @@ import {
       isGlobal: true,
       envFilePath: ['.env', '.env.api-gateway'],
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
+    }),
     AuthModule,
   ],
   controllers: [AppController, TestController],
-  providers: [AppService, CorrelationIdService],
+  providers: [
+    AppService,
+    CorrelationIdService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
