@@ -1,8 +1,8 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
-import { JsonLoggerService } from '@order-fulfillment/shared';
+import { HttpExceptionFilter, JsonLoggerService } from '@order-fulfillment/shared';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +10,14 @@ async function bootstrap() {
   app.useLogger(logger);
   const globalPrefix = 'auth';
   app.setGlobalPrefix(globalPrefix);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
+  app.useGlobalFilters(new HttpExceptionFilter());
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') || 3001;
   await app.listen(port);
