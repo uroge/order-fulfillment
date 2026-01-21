@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:api-gateway": "nx serve api-gateway"
+    "start:api-gateway": "nx serve api-gateway",
+    "start:auth-service": "nx serve auth-service",
+    "auth:migration:generate": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json typeorm-ts-node-commonjs migration:generate -d apps/auth-service/src/database/data-source.ts apps/auth-service/src/database/migrations/InitAuth",
+    "auth:migration:run": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json typeorm-ts-node-commonjs migration:run -d apps/auth-service/src/database/data-source.ts"
   },
   "private": true,
   "dependencies": {
@@ -16,14 +19,17 @@
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^11.2.5",
     "@nestjs/throttler": "^6.0.0",
+    "@nestjs/typeorm": "^11.0.0",
     "axios": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.17.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
@@ -43,6 +49,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/jest": "^30.0.0",
     "@types/node": "20.19.9",
+    "dotenv": "^16.6.1",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "jest": "^30.0.2",
@@ -54,6 +61,7 @@
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
+    "typeorm-ts-node-commonjs": "^0.0.8",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
     "webpack-cli": "^5.1.4"
