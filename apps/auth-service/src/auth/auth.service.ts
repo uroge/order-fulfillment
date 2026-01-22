@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'crypto';
@@ -12,6 +17,7 @@ import { TokensService } from '../tokens/tokens.service';
 import { User } from '../users/entities/user.entity';
 
 const scrypt = promisify(scryptCallback);
+const SCRYPT_KEYLEN = 64;
 
 @Injectable()
 export class AuthService {
@@ -60,8 +66,12 @@ export class AuthService {
 
   async refresh(dto: RefreshDto) {
     const tokenRecord = await this.tokensService.findByToken(dto.refreshToken);
-    if (!tokenRecord || tokenRecord.revokedAt) {
+    if (!tokenRecord) {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+    if (tokenRecord.revokedAt) {
+      await this.tokensService.revokeByTokenFamily(tokenRecord.tokenFamily);
+      throw new ForbiddenException('Refresh token reuse detected');
     }
     if (tokenRecord.expiresAt <= new Date()) {
       throw new UnauthorizedException('Refresh token expired');
@@ -81,6 +91,10 @@ export class AuthService {
   }
 
   async logout(dto: LogoutDto) {
+    const tokenRecord = await this.tokensService.findByToken(dto.refreshToken);
+    if (!tokenRecord) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
     await this.tokensService.revokeByToken(dto.refreshToken);
     return { message: 'Logout accepted' };
   }
@@ -105,7 +119,7 @@ export class AuthService {
 
   private async hashPassword(password: string) {
     const salt = randomBytes(16).toString('hex');
-    const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
+    const derivedKey = (await scrypt(password, salt, SCRYPT_KEYLEN)) as Buffer;
     return `${salt}:${derivedKey.toString('hex')}`;
   }
 
@@ -114,7 +128,7 @@ export class AuthService {
     if (!salt || !key) {
       return false;
     }
-    const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
+    const derivedKey = (await scrypt(password, salt, SCRYPT_KEYLEN)) as Buffer;
     const keyBuffer = Buffer.from(key, 'hex');
     return (
       keyBuffer.length === derivedKey.length &&

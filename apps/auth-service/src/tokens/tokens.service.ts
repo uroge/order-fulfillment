@@ -54,6 +54,13 @@ export class TokensService {
     await this.refreshTokensRepository.update(tokenId, { revokedAt: new Date() });
   }
 
+  async revokeByTokenFamily(tokenFamily: string) {
+    await this.refreshTokensRepository.update(
+      { tokenFamily },
+      { revokedAt: new Date() }
+    );
+  }
+
   private hashToken(token: string) {
     return createHash('sha256').update(token).digest('hex');
   }
