@@ -1,10 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RefreshDto } from './dto/refresh.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LogoutDto } from './dto/logout.dto';
+import {
+  LoginDto,
+  LogoutDto,
+  RefreshDto,
+  RegisterDto,
+} from '@order-fulfillment/shared';
 
 @Controller('auth')
 export class AuthController {

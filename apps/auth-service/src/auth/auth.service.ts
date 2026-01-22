@@ -8,10 +8,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
-import { LoginDto } from './dto/login.dto';
-import { RefreshDto } from './dto/refresh.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LogoutDto } from './dto/logout.dto';
+import {
+  LoginDto,
+  RefreshDto,
+  RegisterDto,
+  LogoutDto,
+} from '@order-fulfillment/shared';
 import { UsersService } from '../users/users.service';
 import { TokensService } from '../tokens/tokens.service';
 import { User } from '../users/entities/user.entity';
