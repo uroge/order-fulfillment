@@ -10,16 +10,16 @@ services:
     volumes:
       - auth_db_data:/var/lib/postgresql/data
 
-  # orders-db:
-  #   image: postgres:16-alpine
-  #   environment:
-  #     POSTGRES_USER: ${ORDERS_DB_USER}
-  #     POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
-  #     POSTGRES_DB: ${ORDERS_DB_NAME}
-  #   ports:
-  #     - '5433:5432'
-  #   volumes:
-  #     - orders_db_data:/var/lib/postgresql/data
+  orders-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${ORDERS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
+      POSTGRES_DB: ${ORDERS_DB_NAME}
+    ports:
+      - '5433:5432'
+    volumes:
+      - orders_db_data:/var/lib/postgresql/data
 
   # payments-db:
   #   image: postgres:16-alpine
@@ -92,7 +92,7 @@ services:
 
 volumes:
   auth_db_data:
-  # orders_db_data:
+  orders_db_data:
   # payments_db_data:
   # inventory_db_data:
   # mongo_data:
