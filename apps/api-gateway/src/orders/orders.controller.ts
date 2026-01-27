@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpException,
   Param,
   Post,
@@ -13,7 +12,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-import { CORRELATION_ID_HEADER } from '@order-fulfillment/shared';
 import { CancelOrderDto, CreateOrderDto } from '@order-fulfillment/shared';
 import { OrdersService } from './orders.service';
 import { AuthUser } from '@order-fulfillment/shared';
@@ -43,7 +41,6 @@ export class OrdersController {
   @Post()
   async createOrder(
     @Body() dto: CreateOrderDto,
-    @Headers(CORRELATION_ID_HEADER) correlationId: string | undefined,
     @CurrentUser() user: AuthUser | undefined
   ) {
     const userId = user?.userId;
@@ -60,9 +57,6 @@ export class OrdersController {
           headers: {
             Authorization: `Bearer ${serviceToken}`,
             'x-user-id': userId,
-            ...(correlationId
-              ? { [CORRELATION_ID_HEADER]: correlationId }
-              : {}),
           },
           validateStatus: () => true,
         }
@@ -78,7 +72,6 @@ export class OrdersController {
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async getOrders(
-    @Headers(CORRELATION_ID_HEADER) correlationId: string | undefined,
     @CurrentUser() user: AuthUser | undefined
   ) {
     const userId = user?.userId;
@@ -93,9 +86,6 @@ export class OrdersController {
           headers: {
             Authorization: `Bearer ${serviceToken}`,
             'x-user-id': userId,
-            ...(correlationId
-              ? { [CORRELATION_ID_HEADER]: correlationId }
-              : {}),
           },
           validateStatus: () => true,
         }
@@ -112,7 +102,6 @@ export class OrdersController {
   @Get(':id')
   async getOrder(
     @Param('id') orderId: string,
-    @Headers(CORRELATION_ID_HEADER) correlationId: string | undefined,
     @CurrentUser() user: AuthUser | undefined
   ) {
     const userId = user?.userId;
@@ -127,9 +116,6 @@ export class OrdersController {
           headers: {
             Authorization: `Bearer ${serviceToken}`,
             'x-user-id': userId,
-            ...(correlationId
-              ? { [CORRELATION_ID_HEADER]: correlationId }
-              : {}),
           },
           validateStatus: () => true,
         }
@@ -147,7 +133,6 @@ export class OrdersController {
   async cancelOrder(
     @Param('id') orderId: string,
     @Body() dto: CancelOrderDto,
-    @Headers(CORRELATION_ID_HEADER) correlationId: string | undefined,
     @CurrentUser() user: AuthUser | undefined
   ) {
     const userId = user?.userId;
@@ -163,9 +148,6 @@ export class OrdersController {
           headers: {
             Authorization: `Bearer ${serviceToken}`,
             'x-user-id': userId,
-            ...(correlationId
-              ? { [CORRELATION_ID_HEADER]: correlationId }
-              : {}),
           },
           validateStatus: () => true,
         }

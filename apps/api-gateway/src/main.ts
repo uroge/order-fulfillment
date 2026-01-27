@@ -2,7 +2,10 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
-import { HttpExceptionFilter, JsonLoggerService } from '@order-fulfillment/shared';
+import {
+  HttpExceptionFilter,
+  JsonLoggerService,
+} from '@order-fulfillment/shared';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -24,6 +27,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const documentBuilder = new DocumentBuilder()
+    .addSecurityRequirements('bearer')
     .setTitle('Order Fulfillment API Gateway')
     .setDescription('API Gateway for microservices')
     .setVersion('1.0')

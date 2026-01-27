@@ -10,9 +10,8 @@ import {
 } from '@order-fulfillment/shared';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody } from '@nestjs/swagger';
 
-@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   private readonly authServiceUrl: URL;
