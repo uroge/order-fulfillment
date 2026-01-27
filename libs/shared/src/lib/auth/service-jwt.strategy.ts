@@ -12,11 +12,18 @@ type ServiceTokenPayload = {
 @Injectable()
 export class ServiceJwtStrategy extends PassportStrategy(Strategy, 'service') {
   constructor(config: ConfigService) {
+    const secret = config.get<string>('SERVICE_JWT_SECRET');
+    if (!secret) {
+      throw new UnauthorizedException('SERVICE_JWT_SECRET is required');
+    }
+    const issuer = config.get<string>('SERVICE_TOKEN_ISSUER');
+    const audience = config.get<string>('SERVICE_TOKEN_AUDIENCE');
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get<string>('SERVICE_JWT_SECRET'),
-      issuer: config.get<string>('SERVICE_TOKEN_ISSUER'),
-      audience: config.get<string>('SERVICE_TOKEN_AUDIENCE'),
+      secretOrKey: secret,
+      issuer: issuer,
+      audience: audience,
     });
   }
 
