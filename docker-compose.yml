@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
       POSTGRES_DB: ${AUTH_DB_NAME}
     ports:
-      - '5432:5432'
+      - '5436:5432'
     volumes:
       - auth_db_data:/var/lib/postgresql/data
 

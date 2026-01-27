@@ -3,9 +3,9 @@ import * as path from 'path';
 import { buildDataSource } from '@order-fulfillment/shared';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-dotenv.config({ path: path.resolve(process.cwd(), '.env.auth-service') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env.orders-service') });
 
-const sourceRoot = path.resolve(process.cwd(), 'apps/auth-service/src');
+const sourceRoot = path.resolve(process.cwd(), 'apps/orders-service/src');
 
 const dataSource = buildDataSource({
   databaseUrl: process.env.DATABASE_URL,
