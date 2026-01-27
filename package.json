@@ -9,7 +9,9 @@
     "auth:migration:generate": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d apps/auth-service/src/app/database/data-source.ts apps/auth-service/src/database/migrations/InitAuth",
     "auth:migration:run": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d apps/auth-service/src/app/database/data-source.ts",
     "orders:migration:generate": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d apps/orders-service/src/database/data-source.ts apps/orders-service/src/database/migrations/InitOrders",
-    "orders:migration:run": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d apps/orders-service/src/database/data-source.ts"
+    "orders:migration:run": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d apps/orders-service/src/database/data-source.ts",
+    "auth:seed": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register apps/auth-service/src/database/seed.ts",
+    "orders:seed": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register apps/orders-service/src/database/seed.ts"
   },
   "private": true,
   "dependencies": {
