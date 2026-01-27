@@ -3,7 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
-import { TestController } from '../test/test.controller';
+import { OrdersModule } from '../orders/orders.module';
+import { TestController } from './test/test.controller';
 import {
   CorrelationIdMiddleware,
   CorrelationIdService,
@@ -28,6 +29,7 @@ import { APP_GUARD } from '@nestjs/core';
       ],
     }),
     AuthModule,
+    OrdersModule,
   ],
   controllers: [AppController, TestController],
   providers: [
