@@ -6,7 +6,7 @@ import { randomBytes, scrypt as scryptCallback } from 'crypto';
 import { promisify } from 'util';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-dotenv.config({ path: path.resolve(process.cwd(), '.env.auth-service') });
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/auth-service/.env') });
 
 const sourceRoot = path.resolve(process.cwd(), 'apps/auth-service/src');
 

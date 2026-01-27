@@ -15,7 +15,7 @@ import { OrdersModule } from './orders/orders.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '.env.orders-service'],
+      envFilePath: ['.env', 'apps/orders-service/.env'],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

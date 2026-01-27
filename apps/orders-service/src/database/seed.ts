@@ -5,7 +5,7 @@ import { Order, OrderStatus } from '../app/orders/entities/order.entity';
 import { OrderItem } from '../app/orders/entities/order-item.entity';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-dotenv.config({ path: path.resolve(process.cwd(), '.env.orders-service') });
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/orders-service/.env') });
 
 const sourceRoot = path.resolve(process.cwd(), 'apps/orders-service/src');
 

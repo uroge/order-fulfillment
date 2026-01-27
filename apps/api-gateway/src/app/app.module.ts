@@ -17,7 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '.env.api-gateway'],
+      envFilePath: ['.env', 'apps/api-gateway/.env'],
     }),
     ThrottlerModule.forRoot({
       throttlers: [

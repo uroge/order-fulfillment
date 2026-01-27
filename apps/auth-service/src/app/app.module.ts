@@ -15,7 +15,7 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '.env.auth-service'],
+      envFilePath: ['.env', 'apps/auth-service/.env'],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
