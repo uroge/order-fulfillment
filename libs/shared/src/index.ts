@@ -6,3 +6,7 @@ export * from './lib/dto/auth/register.dto';
 export * from './lib/dto/auth/login.dto';
 export * from './lib/dto/auth/refresh.dto';
 export * from './lib/dto/auth/logout.dto';
+export * from './lib/transformers/decimal.transformer';
+export * from './lib/dto/orders/create-order.dto';
+export * from './lib/dto/orders/order-item.dto';
+export * from './lib/dto/orders/cancel-order.dto';

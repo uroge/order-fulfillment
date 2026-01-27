@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
+import { decimalToNumber } from '@order-fulfillment/shared';
 
 @Entity({ name: 'order_items' })
 export class OrderItem {
@@ -27,7 +28,13 @@ export class OrderItem {
   @Column({ name: 'qty', type: 'int' })
   qty!: number;
 
-  @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    name: 'price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: decimalToNumber,
+  })
   price!: number;
 
   @CreateDateColumn({ name: 'created_at' })

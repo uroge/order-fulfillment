@@ -40,7 +40,6 @@ export class AuthService {
     const user = await this.usersService.createUser(dto.email, passwordHash);
 
     return {
-      message: 'Registration accepted',
       email: dto.email,
       ...(await this.issueTokens(user)),
     };
@@ -60,7 +59,6 @@ export class AuthService {
     }
 
     return {
-      message: 'Login accepted',
       email: dto.email,
       ...(await this.issueTokens(user)),
     };
@@ -86,7 +84,6 @@ export class AuthService {
     );
 
     return {
-      message: 'Refresh accepted',
       accessToken,
       refreshToken,
     };
@@ -98,7 +95,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
     await this.tokensService.revokeByToken(dto.refreshToken);
-    return { message: 'Logout accepted' };
+    return { status: 'ok' };
   }
 
   private async issueTokens(user: User, tokenFamily?: string) {
