@@ -4,7 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CancelOrderDto, CreateOrderDto } from '@order-fulfillment/shared';
+import {
+  CancelOrderDto,
+  CreateOrderDto,
+  OrderResponseDto,
+} from '@order-fulfillment/shared';
 import { Order, OrderStatus } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import {
@@ -20,7 +24,7 @@ export class OrdersService {
     private readonly ordersRepository: Repository<Order>
   ) {}
 
-  async getOrder(orderId: string, userId: string) {
+  async getOrder(orderId: string, userId: string): Promise<OrderResponseDto> {
     const order = await this.ordersRepository.findOne({
       where: { id: orderId, userId },
       relations: ['items'],
@@ -29,17 +33,21 @@ export class OrdersService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-    return order;
+    return this.toOrderResponse(order);
   }
 
-  async getOrdersForUser(userId: string) {
-    return this.ordersRepository.find({
+  async getOrdersForUser(userId: string): Promise<OrderResponseDto[]> {
+    const orders = await this.ordersRepository.find({
       where: { userId },
       relations: ['items'],
     });
+    return orders.map((order) => this.toOrderResponse(order));
   }
 
-  async createOrder(userId: string, orderDto: CreateOrderDto) {
+  async createOrder(
+    userId: string,
+    orderDto: CreateOrderDto
+  ): Promise<OrderResponseDto> {
     const createdOrder = await this.ordersRepository.manager.transaction(
       async (transactionalEntityManager) => {
         const total = orderDto.items.reduce(
@@ -81,14 +89,14 @@ export class OrdersService {
       }
     );
 
-    return createdOrder;
+    return this.toOrderResponse(createdOrder);
   }
 
   async cancelOrder(
     orderId: string,
     userId: string,
     cancelOrderDto: CancelOrderDto
-  ) {
+  ): Promise<OrderResponseDto> {
     const updatedOrder = await this.ordersRepository.manager.transaction(
       async (transactionalEntityManager) => {
         const order = await transactionalEntityManager.findOne(Order, {
@@ -127,6 +135,24 @@ export class OrdersService {
       }
     );
 
-    return updatedOrder;
+    return this.toOrderResponse(updatedOrder);
+  }
+
+  private toOrderResponse(order: Order): OrderResponseDto {
+    return {
+      id: order.id,
+      userId: order.userId,
+      status: order.status,
+      total: order.total,
+      items: (order.items || []).map((item) => ({
+        sku: item.sku,
+        qty: item.qty,
+        price: item.price,
+      })),
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+      cancelReason: order.cancelReason ?? null,
+      cancelledAt: order.cancelledAt ? order.cancelledAt.toISOString() : null,
+    };
   }
 }

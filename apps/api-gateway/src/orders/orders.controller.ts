@@ -9,22 +9,24 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { ProxyService } from '../common/proxy.service';
 import { ConfigService } from '@nestjs/config';
-import { CancelOrderDto, CreateOrderDto } from '@order-fulfillment/shared';
-import { OrdersService } from './orders.service';
+import {
+  CancelOrderDto,
+  CreateOrderDto,
+  OrderResponseDto,
+} from '@order-fulfillment/shared';
 import { AuthUser } from '@order-fulfillment/shared';
 import { CurrentUser } from '../auth/current-user.decorator';
 
 @Controller('orders')
 export class OrdersController {
   private readonly ordersServiceUrl: URL;
+  private readonly ordersServiceAudience: string;
 
   constructor(
-    private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly ordersService: OrdersService
+    private readonly proxyService: ProxyService
   ) {
     const rawUrl = this.configService.get<string>('ORDERS_SERVICE_URL');
     if (!rawUrl) {
@@ -34,6 +36,12 @@ export class OrdersController {
       this.ordersServiceUrl = new URL(rawUrl);
     } catch {
       throw new Error(`ORDERS_SERVICE_URL is invalid: ${rawUrl}`);
+    }
+    this.ordersServiceAudience =
+      this.configService.get<string>('ORDERS_SERVICE_AUDIENCE') ||
+      this.configService.get<string>('SERVICE_TOKEN_AUDIENCE');
+    if (!this.ordersServiceAudience) {
+      throw new Error('ORDERS_SERVICE_AUDIENCE is required');
     }
   }
 
@@ -48,25 +56,21 @@ export class OrdersController {
       throw new BadRequestException('User context missing');
     }
 
-    const serviceToken = await this.ordersService.createServiceToken();
-    const response = await firstValueFrom(
-      this.httpService.post(
-        `${this.ordersServiceUrl.toString().replace(/\/$/, '')}/orders`,
-        dto,
-        {
-          headers: {
-            Authorization: `Bearer ${serviceToken}`,
-            'x-user-id': userId,
-          },
-          validateStatus: () => true,
-        }
-      )
-    );
+    const response = await this.proxyService.forward<OrderResponseDto>({
+      baseUrl: this.ordersServiceUrl,
+      audience: this.ordersServiceAudience,
+      method: 'POST',
+      path: '/orders',
+      body: dto,
+      headers: {
+        'x-user-id': userId,
+      },
+    });
 
     if (response.status >= 400) {
       throw new HttpException(response.data, response.status);
     }
-    return response.data;
+    return this.toOrderResponse(response.data);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -78,24 +82,20 @@ export class OrdersController {
     if (!userId) {
       throw new BadRequestException('User context missing');
     }
-    const serviceToken = await this.ordersService.createServiceToken();
-    const response = await firstValueFrom(
-      this.httpService.get(
-        `${this.ordersServiceUrl.toString().replace(/\/$/, '')}/orders`,
-        {
-          headers: {
-            Authorization: `Bearer ${serviceToken}`,
-            'x-user-id': userId,
-          },
-          validateStatus: () => true,
-        }
-      )
-    );
+    const response = await this.proxyService.forward<OrderResponseDto[]>({
+      baseUrl: this.ordersServiceUrl,
+      audience: this.ordersServiceAudience,
+      method: 'GET',
+      path: '/orders',
+      headers: {
+        'x-user-id': userId,
+      },
+    });
 
     if (response.status >= 400) {
       throw new HttpException(response.data, response.status);
     }
-    return response.data;
+    return this.toOrderResponseList(response.data);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -108,24 +108,20 @@ export class OrdersController {
     if (!userId) {
       throw new BadRequestException('User context missing');
     }
-    const serviceToken = await this.ordersService.createServiceToken();
-    const response = await firstValueFrom(
-      this.httpService.get(
-        `${this.ordersServiceUrl.toString().replace(/\/$/, '')}/orders/${orderId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${serviceToken}`,
-            'x-user-id': userId,
-          },
-          validateStatus: () => true,
-        }
-      )
-    );
+    const response = await this.proxyService.forward<OrderResponseDto>({
+      baseUrl: this.ordersServiceUrl,
+      audience: this.ordersServiceAudience,
+      method: 'GET',
+      path: `/orders/${orderId}`,
+      headers: {
+        'x-user-id': userId,
+      },
+    });
 
     if (response.status >= 400) {
       throw new HttpException(response.data, response.status);
     }
-    return response.data;
+    return this.toOrderResponse(response.data);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -139,24 +135,38 @@ export class OrdersController {
     if (!userId) {
       throw new BadRequestException('User context missing');
     }
-    const serviceToken = await this.ordersService.createServiceToken();
-    const response = await firstValueFrom(
-      this.httpService.post(
-        `${this.ordersServiceUrl.toString().replace(/\/$/, '')}/orders/${orderId}/cancel`,
-        dto,
-        {
-          headers: {
-            Authorization: `Bearer ${serviceToken}`,
-            'x-user-id': userId,
-          },
-          validateStatus: () => true,
-        }
-      )
-    );
+    const response = await this.proxyService.forward<OrderResponseDto>({
+      baseUrl: this.ordersServiceUrl,
+      audience: this.ordersServiceAudience,
+      method: 'POST',
+      path: `/orders/${orderId}/cancel`,
+      body: dto,
+      headers: {
+        'x-user-id': userId,
+      },
+    });
 
     if (response.status >= 400) {
       throw new HttpException(response.data, response.status);
     }
-    return response.data;
+    return this.toOrderResponse(response.data);
+  }
+
+  private toOrderResponse(data: OrderResponseDto): OrderResponseDto {
+    return {
+      id: data.id,
+      userId: data.userId,
+      status: data.status,
+      total: data.total,
+      items: data.items ?? [],
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      cancelReason: data.cancelReason ?? null,
+      cancelledAt: data.cancelledAt ?? null,
+    };
+  }
+
+  private toOrderResponseList(data: OrderResponseDto[]): OrderResponseDto[] {
+    return Array.isArray(data) ? data.map((order) => this.toOrderResponse(order)) : [];
   }
 }

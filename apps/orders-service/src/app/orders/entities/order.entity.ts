@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { OrderItem } from './order-item.entity';
 import { decimalToNumber } from '@order-fulfillment/shared';
 
@@ -39,7 +38,6 @@ export class Order {
   })
   total!: number;
 
-  @Exclude()
   @VersionColumn()
   version!: number;
 

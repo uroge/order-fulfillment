@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { TokensModule } from '../tokens/tokens.module';
+import { ServiceJwtStrategy } from '@order-fulfillment/shared';
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { TokensModule } from '../tokens/tokens.module';
     ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, ServiceJwtStrategy],
 })
 export class AuthModule {}

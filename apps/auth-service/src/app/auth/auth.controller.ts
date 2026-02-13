@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import {
@@ -7,7 +7,9 @@ import {
   RefreshDto,
   RegisterDto,
 } from '@order-fulfillment/shared';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('service'))
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

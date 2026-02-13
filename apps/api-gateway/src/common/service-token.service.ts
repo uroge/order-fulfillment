@@ -3,17 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class OrdersService {
+export class ServiceTokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
   ) {}
 
-  async createServiceToken() {
+  async createServiceToken(audience: string) {
     const issuer = this.configService.get<string>('SERVICE_TOKEN_ISSUER');
-    const audience = this.configService.get<string>('SERVICE_TOKEN_AUDIENCE');
     const secret = this.configService.get<string>('SERVICE_JWT_SECRET');
-    if (!issuer || !audience || !secret) {
+    if (!issuer || !secret) {
       throw new Error('Service token config is missing');
     }
 

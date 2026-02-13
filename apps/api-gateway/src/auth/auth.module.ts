@@ -3,11 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
-import { HttpModule } from '@nestjs/axios';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
-    HttpModule,
+    CommonModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
