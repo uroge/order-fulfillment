@@ -5,6 +5,7 @@ import {
   CorrelationIdService,
   JsonLoggerService,
   RequestLoggingMiddleware,
+  RabbitMqModule,
 } from '@order-fulfillment/shared';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -36,6 +37,7 @@ import { OrdersModule } from './orders/orders.module';
         },
       ],
     }),
+    RabbitMqModule,
     OrdersModule,
   ],
   providers: [
