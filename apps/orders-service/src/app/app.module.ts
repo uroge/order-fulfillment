@@ -9,13 +9,13 @@ import {
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', 'apps/auth-service/.env'],
+      envFilePath: ['.env', 'apps/orders-service/.env'],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -36,7 +36,7 @@ import { AuthModule } from './auth/auth.module';
         },
       ],
     }),
-    AuthModule,
+    OrdersModule,
   ],
   providers: [
     CorrelationIdService,
