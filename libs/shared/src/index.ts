@@ -12,6 +12,8 @@ export * from './lib/auth/service-jwt.strategy';
 export * from './lib/auth/auth-user';
 export * from './lib/dto/orders/order-item-response.dto';
 export * from './lib/dto/orders/order-response.dto';
+export * from './lib/rabbitmq/rabbitmq.module';
+export * from './lib/rabbitmq/rabbitmq.service';
 export * from './lib/dto/orders/create-order.dto';
 export * from './lib/dto/orders/order-item.dto';
 export * from './lib/dto/orders/cancel-order.dto';

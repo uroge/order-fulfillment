@@ -54,14 +54,14 @@ services:
   #   volumes:
   #     - mongo_data:/data/db
 
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   environment:
-  #     RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-  #     RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-  #   ports:
-  #     - '${RABBITMQ_PORT}:5672'
-  #     - '${RABBITMQ_MANAGEMENT_PORT}:15672'
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - '${RABBITMQ_PORT}:5672'
+      - '${RABBITMQ_MANAGEMENT_PORT}:15672'
 
   # zookeeper:
   #   image: confluentinc/cp-zookeeper:7.6.1
