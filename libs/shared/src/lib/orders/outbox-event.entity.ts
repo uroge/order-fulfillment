@@ -7,6 +7,7 @@ export enum OrderEventType {
 
 export enum OutboxStatus {
   PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
   PUBLISHED = 'PUBLISHED',
   FAILED = 'FAILED',
 }
@@ -24,6 +25,15 @@ export class OutboxEvent {
 
   @Column({ name: 'status', type: 'enum', enum: OutboxStatus, default: OutboxStatus.PENDING })
   status!: OutboxStatus;
+
+  @Column({ name: 'attempts', type: 'int', default: 0 })
+  attempts!: number;
+
+  @Column({ name: 'next_attempt_at', type: 'timestamptz', nullable: true })
+  nextAttemptAt!: Date | null;
+
+  @Column({ name: 'last_error', type: 'text', nullable: true })
+  lastError!: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
