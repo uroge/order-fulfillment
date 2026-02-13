@@ -4,7 +4,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
-import { OutboxEvent } from './entities/outbox-event.entity';
+import { OutboxEvent } from '@order-fulfillment/shared';
 import { AuthModule } from '../../auth/auth.module';
 
 @Module({

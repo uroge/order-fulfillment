@@ -15,7 +15,7 @@ import {
   OrderEventType,
   OutboxEvent,
   OutboxStatus,
-} from './entities/outbox-event.entity';
+} from '@order-fulfillment/shared';
 
 @Injectable()
 export class OrdersService {

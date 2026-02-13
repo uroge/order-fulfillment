@@ -2,8 +2,8 @@ import { DataSource } from 'typeorm';
 
 type BuildDataSourceOptions = {
   databaseUrl: string | undefined;
-  entitiesGlob: string;
-  migrationsGlob: string;
+  entitiesGlob: string | string[];
+  migrationsGlob: string | string[];
 };
 
 export function buildDataSource(options: BuildDataSourceOptions) {
@@ -14,8 +14,12 @@ export function buildDataSource(options: BuildDataSourceOptions) {
   return new DataSource({
     type: 'postgres',
     url: options.databaseUrl,
-    entities: [options.entitiesGlob],
-    migrations: [options.migrationsGlob],
+    entities: Array.isArray(options.entitiesGlob)
+      ? options.entitiesGlob
+      : [options.entitiesGlob],
+    migrations: Array.isArray(options.migrationsGlob)
+      ? options.migrationsGlob
+      : [options.migrationsGlob],
     synchronize: false,
   });
 }
