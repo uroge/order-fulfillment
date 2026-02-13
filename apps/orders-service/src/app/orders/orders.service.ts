@@ -10,18 +10,21 @@ import {
   OrderResponseDto,
 } from '@order-fulfillment/shared';
 import { Order, OrderStatus } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   OrderEventType,
   OutboxEvent,
   OutboxStatus,
 } from '@order-fulfillment/shared';
+import { CatalogPrice } from './entities/catalog-price.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
-    private readonly ordersRepository: Repository<Order>
+    private readonly ordersRepository: Repository<Order>,
+    @InjectRepository(CatalogPrice)
+    private readonly catalogPriceRepository: Repository<CatalogPrice>
   ) {}
 
   async getOrder(orderId: string, userId: string): Promise<OrderResponseDto> {
@@ -51,20 +54,57 @@ export class OrdersService {
     const createdOrder = await this.ordersRepository.manager.transaction(
       async (transactionalEntityManager) => {
         const total = orderDto.items.reduce(
+          (sum, item) => sum + item.qty,
+          0
+        );
+        if (total <= 0) {
+          throw new BadRequestException('Order must contain at least one item');
+        }
+
+        const skus = [...new Set(orderDto.items.map((item) => item.sku))];
+        const prices = await this.catalogPriceRepository.find({
+          where: {
+            sku: In(skus),
+            currency: orderDto.currency,
+            isActive: true,
+          },
+        });
+        const pricesBySku = new Map(prices.map((price) => [price.sku, price]));
+
+        const orderItems = orderDto.items.map((item) => {
+          const catalogPrice = pricesBySku.get(item.sku);
+          if (!catalogPrice) {
+            throw new BadRequestException(
+              `No active catalog price for sku=${item.sku} currency=${orderDto.currency}`
+            );
+          }
+
+          if (
+            typeof item.price === 'number' &&
+            !this.sameMoney(item.price, catalogPrice.unitPrice)
+          ) {
+            throw new BadRequestException(
+              `Price mismatch for sku=${item.sku}: expected ${catalogPrice.unitPrice}, got ${item.price}`
+            );
+          }
+
+          return {
+            sku: item.sku,
+            qty: item.qty,
+            price: catalogPrice.unitPrice,
+          };
+        });
+
+        const computedTotal = orderItems.reduce(
           (sum, item) => sum + item.qty * item.price,
           0
         );
 
-        const orderItems = orderDto.items.map((item) => ({
-          sku: item.sku,
-          qty: item.qty,
-          price: item.price,
-        }));
-
         const order = transactionalEntityManager.create(Order, {
           userId,
           status: OrderStatus.PENDING,
-          total,
+          currency: orderDto.currency,
+          total: computedTotal,
           items: orderItems,
         });
 
@@ -79,6 +119,7 @@ export class OrdersService {
             orderId: order.id,
             userId: order.userId,
             status: order.status,
+            currency: order.currency,
             total: order.total,
             items: orderItems,
           },
@@ -143,6 +184,7 @@ export class OrdersService {
       id: order.id,
       userId: order.userId,
       status: order.status,
+      currency: order.currency,
       total: order.total,
       items: (order.items || []).map((item) => ({
         sku: item.sku,
@@ -154,5 +196,9 @@ export class OrdersService {
       cancelReason: order.cancelReason ?? null,
       cancelledAt: order.cancelledAt ? order.cancelledAt.toISOString() : null,
     };
+  }
+
+  private sameMoney(left: number, right: number): boolean {
+    return Math.abs(left - right) < 0.00001;
   }
 }

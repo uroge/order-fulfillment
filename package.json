@@ -6,6 +6,7 @@
     "start:api-gateway": "nx serve api-gateway",
     "start:auth-service": "nx serve auth-service",
     "start:orders-service": "nx serve orders-service",
+    "start:orders-outbox-worker": "nx serve orders-outbox-worker",
     "auth:migration:generate": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d apps/auth-service/src/database/data-source.ts apps/auth-service/src/database/migrations/$npm_config_name",
     "auth:migration:run": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d apps/auth-service/src/database/data-source.ts",
     "orders:migration:generate": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d apps/orders-service/src/database/data-source.ts apps/orders-service/src/database/migrations/$npm_config_name",
@@ -13,7 +14,8 @@
     "auth:seed": "TS_NODE_PROJECT=apps/auth-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register apps/auth-service/src/database/seed.ts",
     "orders:seed": "TS_NODE_PROJECT=apps/orders-service/tsconfig.migrations.json node -r ts-node/register/transpile-only -r tsconfig-paths/register apps/orders-service/src/database/seed.ts",
     "dev:auth": "yarn auth:migration:run && yarn auth:seed && yarn start:auth-service",
-    "dev:orders": "yarn orders:migration:run && yarn orders:seed && yarn start:orders-service"
+    "dev:orders": "yarn orders:migration:run && yarn orders:seed && yarn start:orders-service",
+    "dev:orders-worker": "yarn orders:migration:run && yarn start:orders-outbox-worker"
   },
   "private": true,
   "dependencies": {

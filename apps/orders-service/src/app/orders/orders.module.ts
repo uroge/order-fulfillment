@@ -6,9 +6,13 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OutboxEvent } from '@order-fulfillment/shared';
 import { AuthModule } from '../../auth/auth.module';
+import { CatalogPrice } from './entities/catalog-price.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderItem, OutboxEvent]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Order, OrderItem, OutboxEvent, CatalogPrice]),
+    AuthModule,
+  ],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],

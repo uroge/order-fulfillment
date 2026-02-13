@@ -157,6 +157,7 @@ export class OrdersController {
       id: data.id,
       userId: data.userId,
       status: data.status,
+      currency: data.currency,
       total: data.total,
       items: data.items ?? [],
       createdAt: data.createdAt,

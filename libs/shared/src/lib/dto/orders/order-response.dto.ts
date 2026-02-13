@@ -11,6 +11,9 @@ export class OrderResponseDto {
   @ApiProperty({ example: 'PENDING' })
   status: string;
 
+  @ApiProperty({ example: 'USD' })
+  currency: string;
+
   @ApiProperty({ example: 39.98 })
   total: number;
 

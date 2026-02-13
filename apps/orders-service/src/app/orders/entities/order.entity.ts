@@ -29,6 +29,9 @@ export class Order {
   @Column({ name: 'status', type: 'enum', enum: OrderStatus })
   status!: OrderStatus;
 
+  @Column({ name: 'currency', type: 'varchar', length: 3 })
+  currency!: string;
+
   @Column({
     name: 'total',
     type: 'decimal',
