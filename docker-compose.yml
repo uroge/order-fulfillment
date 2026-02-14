@@ -63,6 +63,71 @@ services:
       - '${RABBITMQ_PORT}:5672'
       - '${RABBITMQ_MANAGEMENT_PORT}:15672'
 
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    env_file:
+      - .env
+      - apps/auth-service/.env
+    environment:
+      DATABASE_URL: postgres://${AUTH_DB_USER}:${AUTH_DB_PASSWORD}@auth-db:5432/${AUTH_DB_NAME}
+      PORT: 3001
+    depends_on:
+      - auth-db
+      - rabbitmq
+    ports:
+      - '3001:3001'
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: apps/orders-service/Dockerfile
+    env_file:
+      - .env
+      - apps/orders-service/.env
+    environment:
+      DATABASE_URL: postgres://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/${ORDERS_DB_NAME}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      PORT: 3002
+    depends_on:
+      - orders-db
+      - rabbitmq
+    ports:
+      - '3002:3002'
+
+  orders-outbox-worker:
+    build:
+      context: .
+      dockerfile: apps/orders-outbox-worker/Dockerfile
+    env_file:
+      - .env
+      - apps/orders-outbox-worker/.env
+    environment:
+      DATABASE_URL: postgres://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/${ORDERS_DB_NAME}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      NODE_ENV: production
+    depends_on:
+      - orders-db
+      - rabbitmq
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    env_file:
+      - .env
+      - apps/api-gateway/.env
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:3001
+      ORDERS_SERVICE_URL: http://orders-service:3002
+      PORT: 3000
+    depends_on:
+      - auth-service
+      - orders-service
+    ports:
+      - '3000:3000'
+
   # zookeeper:
   #   image: confluentinc/cp-zookeeper:7.6.1
   #   environment:
